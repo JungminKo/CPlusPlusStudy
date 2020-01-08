@@ -17,8 +17,8 @@ int main(void)
 ```
 
 <주의 깊게 봐야할 것>
-- 헤더파일 선언문 #include <iostream>
+1. 헤더파일 선언문 #include <iostream>
   <br> - iostream     vs               iostream.h 
   <br> 새로운 표준 라이브러리 및 헤더 의미 vs 과거의 표준 입출력 라이브러리 및 헤더 의미
-- std::cout과 <<을 이용한 출력
-- std::endl을 이용한 개행
+2. std::cout과 <<을 이용한 출력
+3. std::endl을 이용한 개행
