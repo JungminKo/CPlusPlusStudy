@@ -12,7 +12,7 @@ int main(void)
   std::cout<<"Hello "<<"Word!"<<std::endl;
   std::cout<<num<<' '<<'A';
   std::cout<<' '<<3.14<<std::endl;
-  return0;
+  return 0;
 }
 ```
 
