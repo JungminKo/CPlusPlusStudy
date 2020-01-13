@@ -100,3 +100,45 @@ int main(void)
 	return 0;
 }
 ```
+
+
+### 01-2.함수 오버로딩(Function Overloading)
+- C++에서는 함수호출 시 전달되는 인자를 통해서 호출하고자 하는 함수의 구분이 가능하기 때문에
+<br> 매개변수의 선언형태가 다르면, 동일한 이름의 함수정의를 허용함
+<br> : 함수 오버로딩(Function Overloading)
+
+- 함수 오버로딩의 조건 : 매개변수의 `자료형` 또는 `개수`가 다르다.
+<br> 주의 : 반환형이 다른 건 함수를 구분하는 기준이 될 수 없음
+
+
+*C에서는 안되는 이유?*
+- C++은 호출할 함수를 찾을 때 C와 달리 '함수의 이름', '매개변수의 선언'을 동시에 활용함
+- 반면, C는 '함수의 이름'으로만 호출대상을 찾기 때문에 동일한 이름의 함수가 정의되는 것을 허용하지 않음
+
+```C++
+#include <iostream>
+
+void MyFunc(void)
+{
+	std::cout << "MyFunc(void) called" << std::endl;
+}
+
+void MyFunc(char c)
+{
+	std::cout << "MyFunc(char c) called" << std::endl;
+}
+
+void MyFunc(int a, int b)
+{
+	std::cout << "MyFunc(int a, int b) called" << std::endl;
+}
+
+int main(void)
+{
+	MyFunc();
+	MyFunc('A');
+	MyFunc(12, 13);
+		
+	return 0;
+}
+```
