@@ -210,7 +210,257 @@ int BoxVolume(int length, int width, int height)
 - 주의 : BoxVolume()는 불가능! length에는 디폴트값이 설정되어있지 않음
 
 ### 01-4. 인라인(inline) 함수
+- C 언어의 매크로 함수와 유사
+<br> 장 : 일반적인 함수에 비해서 실행속도가 빠름
+<br> 단 : 복잡한 함수는 매크로의 형태로 정의하기가 어려움
+- 인라인 함수는 몸체 부분이 호출문을 대체
+```C++
+#include <iostream>
 
+inline int SQUARE(int x)
+{
+	return x * x;
+}
+
+int main(void)
+{
+	std::cout << SQUARE(5) << std::endl;
+	std::cout << SQUARE(12) << std::endl;
+	return 0;
+}
+```
+#### 참고
+- 매크로를 이용한 함수의 인라인화는 전처리기에 의해 처리되지만, 키워드 inline을 이용한 함수의 인라인화는 컴파일러에 의해 처리됨
+- 따라서 컴파일러는 함수의 인라인화가 오히려 성능에 안좋다고 판단되면 이 키워드를 무시하기도 함
+- 또한 컴파일러는 필요한 경우 일부 함수를 임의로 인라인 처리하기도 함
+
+#### 매크로 함수에는 있지만 인라인 함수에는 없는 장점
+- 매크로 함수는 자료형에 의존적이지 않은 반면 인라인 함수는 의존적임
+<br> ex. #define SQUARE(x) ((x)*(x))
+<br> ex. inline int SQUARE(int x) {return x*x;) // int로 한정됨
+
+- 사실 이렇게 하는 방법도 있다고 함(추후에 배울 예정)
+<br> : `플릿`이라는 방법임
+```c++
+#include <iostream>
+
+template <typename T>
+inline T SQUARE(T x)
+{
+	return x * x;
+}
+
+int main(void)
+{
+	std::cout << SQUARE(5.5) << std::endl;
+	std::cout << SQUARE(12) << std::endl;
+	return 0;
+}
+```
 ### 01-5. 이름공간(namespace)에 대한 소개
+- `::` : 범위지정 연산자(scope resolution operator)
+<br> 이름공간을 지정할 때 사용하는 연산자
 
-### 01-6. OOP 단계별 프로젝트 01단계
+```c++
+#include <iostream>
+
+namespace BestComImpl
+{
+	void SimpleFunc(void)
+	{
+		std::cout << "BestCom이 정의한 함수" << std::endl;
+	}
+}
+
+namespace ProgComImpl
+{
+	void SimpleFunc(void)
+	{
+		std::cout << "ProgCom이 정의한 함수" << std::endl;
+	}
+}
+
+int main(void)
+{
+	BestComImpl::SimpleFunc();
+	ProgComImpl::SimpleFunc();
+	return 0;
+}
+```
+#### 이름공간 기반의 함수 선언과 정의의 구분
+```C++
+#include <iostream>
+
+namespace BestComImpl
+{
+	void SimpleFunc(void);
+}
+
+namespace ProgComImpl
+{
+	void SimpleFunc(void);
+}
+
+int main(void)
+{
+	BestComImpl::SimpleFunc();
+	ProgComImpl::SimpleFunc();
+	return 0;
+}
+
+void BestComImpl::SimpleFunc(void)
+{
+	std::cout << "BestCom이 정의한 함수" << std::endl;
+}
+
+void ProgComImpl::SimpleFunc(void)
+{
+	std::cout << "ProgCom이 정의한 함수" << std::endl;
+}
+```
+```C++
+#include <iostream>
+
+namespace BestComImpl
+{
+	void SimpleFunc(void);
+}
+
+namespace BestComImpl
+{
+	void PrettyFunc(void);
+}
+
+namespace ProgComImpl
+{
+	void SimpleFunc(void);
+}
+
+int main(void)
+{
+	BestComImpl::SimpleFunc();
+	return 0;
+}
+
+void BestComImpl::SimpleFunc(void)
+{
+	std::cout << "BestCom이 정의한 함수" << std::endl;
+	PrettyFunc();             // 동일 이름공간
+	ProgComImpl::SimpleFunc(); // 다른 이름공간
+}
+
+void BestComImpl::PrettyFunc(void)
+{
+	std::cout << "So Pretty!" << std::endl;
+}
+
+void ProgComImpl::SimpleFunc(void)
+{
+	std::cout << "Progcom이 정의한 함수" << std::endl;
+}
+```
+
+#### 이름공간의 중첩
+- 이름공간안에 다른 이름공간이 삽입될 수 있음
+```C++
+namespace Parent
+{
+	int num=2;
+	namespace SubOne
+	{
+		int num=3;
+	}
+	
+	namespace SubTwo
+	{
+		int num=4;
+	}
+}
+
+std::cout<<Parent::num<<std::endl;
+std::cout<<Parent::SubOne::num<<std::endl;
+std::cout<<Parent::SubTwo::num<<std::endl;
+```
+#### using을 이용한 이름공간의 명시
+- 함수의 이름이든 변수의 이름이든 using을 써서 사용 가능
+<br> `using <이름공간>::함수/변수 이름`
+- 혹은, 이름공간만 적을 수도 있음 -> 이름공간에 선언된 모든 것에 대해 이름공간 지정의 생략 명령어
+<br> `using namespace <이름공간>`
+<br> 단, 이렇게 할 때는 이름충돌이 발생활 확률이 높아짐!!
+- 지역변수의 선언과 유사함. 따라서 선언된 지역을 벗어나면 효력을 잃게 됨
+
+```C++
+#include <iostream>
+
+namespace Hybrid
+{
+	void HybFunc(void)
+	{
+		std::cout << "So simple function!" << std::endl;
+		std::cout << "In namespace Hybrid!" << std::endl;
+	}
+}
+
+int main(void)
+{
+	using Hybrid::HybFunc;
+	HybFunc();
+	return 0;
+}
+```
+
+```C++
+#include <iostream>
+
+using namespace std;
+
+int main(void)
+{
+	int num = 20;
+	cout << "Hello World!" << endl;
+	cout << "Hello " << "World!" << endl;
+	cout << num << ' ' << 'A';
+	cout << ' ' << 3.14 << endl;
+	return 0;
+}
+```
+#### 이름공간의 별칭 지정
+- 이름공간이 중첩되면서까지 과도하게 사용되었을 때, 별칭 사용
+```C++
+#include <iostream>
+
+using namespace std;
+
+namespace AAA
+{
+	namespace BBB
+	{
+		namespace CCC
+		{
+			int num1;
+			int num2;
+		}
+	}
+}
+
+int main(void)
+{
+	AAA::BBB::CCC::num1 = 20;
+	AAA::BBB::CCC::num2 = 30;
+
+	namespace ABC = AAA::BBB::CCC;
+	cout << ABC::num1 << endl;
+	cout << ABC::num2 << endl;
+	return 0;
+}
+```
+#### 범위지정 연산자를 사용하면 전역변수에 접근 가능
+```C++
+int val=100; //전역변수
+int SimpleFunc(void)
+{
+	int val=20; // 지역변수
+	val+=30; // 지역변수 val의 값 3 증가
+	::val+=7 // 전역변수 val의 값 7 증가
+}
+```
