@@ -102,7 +102,7 @@ int main(void)
 ```
 
 
-### 01-2.함수 오버로딩(Function Overloading)
+### 01-2. 함수 오버로딩(Function Overloading)
 - C++에서는 함수호출 시 전달되는 인자를 통해서 호출하고자 하는 함수의 구분이 가능하기 때문에
 <br> 매개변수의 선언형태가 다르면, 동일한 이름의 함수정의를 허용함
 <br> : 함수 오버로딩(Function Overloading)
@@ -143,4 +143,74 @@ int main(void)
 }
 ```
 
-### 01-3.
+### 01-3. 매개변수의 디폴트 값(Default Value)
+- C++의 함수에는 '디폴트 값'이라는 것을 설정할 수 있음
+- 매개변수에 디폴트 값이 설정되어 있으면 선언된 매개변수의 수보다 적은 수의 인자 전달이 가능
+<br> 단, 전달되는 인자는 왼쪽에서부터 채워져 나가고, 부족한 부분은 디폴트 값으로 채워짐
+- 함수의 원형을 별도로 선언하는 경우, 매개변수의 디폴트 값은 함수의 선언 부분에만 표현하면 됨
+
+```C++
+#include <iostream>
+
+int Adder(int num1 = 1, int num2 = 2) 
+{
+	return num1 + num2;
+}
+
+int main(void)
+{
+	std::cout << Adder() << std::endl;
+	std::cout << Adder(5) << std::endl; 
+	std::cout << Adder(3, 5) << std::endl;
+	return 0;
+}
+```
+
+```C++
+#include <iostream>
+
+int Adder(int num1 = 1, int num2 = 2);
+
+int main(void)
+{
+	std::cout << Adder() << std::endl;
+	std::cout << Adder(5) << std::endl;
+	std::cout << Adder(3, 5) << std::endl;
+	return 0;
+}
+
+int Adder(int num1, int num2)
+{
+	return num1 + num2;
+}
+```
+
+#### 부분적 디폴트 값 설정
+- 부분적으로 디폴트 값을 설정할 때는 오른쪽 매개변수의 디폴트 값부터 채우는 형태로 정의해야 함
+<br> WHY?
+<br> 함수에 전달되는 인자는 왼쪽에서부터 오른쪽으로 채워지기 때문
+```C++
+#include <iostream>
+
+int BoxVolume(int length, int width = 1, int height = 1);
+
+int main(void)
+{
+	std::cout << "[3, 3, 3] : " << BoxVolume(3, 3, 3) << std::endl;
+	std::cout << "[5, 5, D] : " << BoxVolume(5, 5) << std::endl;
+	std::cout << "[7, D, D] : " << BoxVolume(7) << std::endl;
+	return 0;
+}
+
+int BoxVolume(int length, int width, int height)
+{
+	return length * width * height;
+}
+```
+- 주의 : BoxVolume()는 불가능! length에는 디폴트값이 설정되어있지 않음
+
+### 01-4. 인라인(inline) 함수
+
+### 01-5. 이름공간(namespace)에 대한 소개
+
+### 01-6. OOP 단계별 프로젝트 01단계
