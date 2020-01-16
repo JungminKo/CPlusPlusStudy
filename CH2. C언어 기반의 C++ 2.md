@@ -173,3 +173,72 @@ int main(void)
 	return 0;
 }
 ```
+
+- 함수 내에서 참조자를 통한 값의 변경을 원하지 않을 때 참조자를 const로 선언-> 함수의 원형만 봐도 값의 변경이 이뤄지지 않음을 확인할 수 있음
+<br> 사실 참조자는 많이 이용하는 편이 아님
+
+#### 반환형이 참조형일 수 있음
+- 둘의 차이는?
+```C++
+int& RefRetFuncOne(int &ref)
+{
+	ref++;
+	return ref;
+}
+```
+```C++
+int RefRetFuncTwo(int &ref)
+{
+	ref++;
+	return ref;
+}
+```
+
+#### 참조자 반환하고 다시 참조자에 저장
+```C++
+#include <iostream>
+
+using namespace std;
+
+int& RefRetFuncOne(int &ref)
+{
+	ref++;
+	return ref;
+}
+
+int main(void)
+{
+	int num1 = 1;
+	int &num2 = RefRetFuncOne(num1); // 참조자 반환하고 다시 참조자에 저장
+
+	num1++;
+	num2++;
+	cout << "num1: " << num1 << endl;
+	cout << "num2: " << num2 << endl;
+	return 0;
+}
+```
+#### 참조자 반환하고 일반변수에 저장. 별개의 변수로 됨.
+```C++
+#include <iostream>
+
+using namespace std;
+
+int& RefRetFuncOne(int &ref) 
+{
+	ref++;
+	return ref;
+}
+
+int main(void)
+{
+	int num1 = 1;
+	int num2 = RefRetFuncOne(num1); // 참조자 반환하고 일반변수에 저장. 별개의 변수로 됨.
+
+	num1+=1;
+	num2+=100;
+	cout << "num1: " << num1 << endl;
+	cout << "num2: " << num2 << endl;
+	return 0;
+}
+```
