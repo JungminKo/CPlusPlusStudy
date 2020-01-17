@@ -298,3 +298,100 @@ int Adder(const int &num1, const int &num2)
 	return num1+num2;
 }
 ```
+
+
+### 02-5. malloc & free를 대신하는 new & delete
+
+#### mew & delete
+- new : malloc 대신
+- delete : free 대신
+```C++
+#include <iostream>
+#include <string.h>
+#include <stdlib.h>
+
+using namespace std;
+
+char * MakeStrAdr(int len)
+{
+	char * str = new char[len];
+	return str;
+}
+
+int main(void)
+{
+	char * str = MakeStrAdr(20);
+	strcpy(str, "I am so happy~");
+	cout << str << endl;
+	delete[]str;
+	return 0;
+}
+```
+
+
+#### cf) C언어에서 보이던 방식
+- 단점1) 할당할 대사의 정보는 무조건 바이트 크기단위로 전달
+- 단점2) 반환형이 void형 포인터이기 때문에 적절한 형 변환 필요
+```C++
+#include <iostream>
+#include <string.h>
+#include <stdlib.h>
+
+using namespace std;
+
+char * MakeStrAdr(int len)
+{
+	char * str = (char *)malloc(sizeof(char)*len);
+	return str;
+}
+
+int main(void)
+{
+	char * str = MakeStrAdr(20);
+	strcpy(str, "I am so happy~");
+	cout << str << endl;
+	free(str);
+	return 0;
+}
+```
+
+#### 객체의 생성에는 반드시 new & delete
+- new를 이용해야만 객체가 생성됨... 이유는 추후 클래스를 배우면서!!
+```C++
+#include <iostream>
+#include <stdlib.h>
+
+using namespace std;
+
+class Simple
+{
+public:
+	Simple()
+	{
+		cout << "I'm simple constructor!" << endl;
+	}
+};
+
+int main(void)
+{
+	cout << "case 1: ";
+	Simple * sp1 = new Simple; // new 연산자를 이용해 힙 영역에 변수 할당
+
+	cout << "case2: ";
+	Simple * sp2 = (Simple *)malloc(sizeof(Simple) * 1); // malloc 함수호출을 통해 힙 영역에 변수 할당
+
+	cout << endl << "end of main" << endl;
+	delete sp1;
+	free(sp2);
+
+	return 0;
+}
+```
+
+#### 참조자로도 힙에 할당된 변수 접근 가능
+```C++
+int *ptr=new int;
+int &ref=*ptr;
+ref=20;
+cout<<*ptr<<endl;
+```
