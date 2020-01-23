@@ -418,7 +418,370 @@ int main(void)
 - 멤버함수 : 클래스 내에 정의된 함수
 
 #### C++에서의 파일분할
+- Car.h : 클래스의 선언을 담음
+- Car.cpp : 클래스의 정의(멤버함수의 정의)를 담음
 
-### 03-2. 
+* class의 선언 : 컴파일러가 Car 클래스와 관련된 문장의 오류를 잡아내는 데 필요한 최소한의 정보로써, 클래스를 구성하는 외형적인 틀
+* class의 정의 : 다른 문장의 컴파일에 필요한 정보를 가지고 있지 않음. 따라서 함수의 정의는 컴파일된 이후에 링커에 의해 하나의 실행파일로 묶기만 하면 됨
 
-### 03-3. 
+- 결론 
+<br> 클래스의 선언 : 헤더파일에 저장을 해서 필요한 위치에 쉽게 포함되도록 함
+<br> 클래스의 정의 : 소스 파일에 저장해서 컴파일이 되도록 함
+
+##### Car.h
+```C++
+#ifndef  __CAR_H__ //헤더파일의 중복포함 문제를 해결하기 위한 매크로 선언
+#define __CAR_H__
+
+namespace CAR_CONST // 클래스 Car에서 제한적으로 사용되는 상수의 선언이므로 클래스 Car와 같은 파일에 선언
+{
+	enum
+	{
+		ID_LEN = 20,
+		MAX_SPD = 200,
+		FUEL_STEP = 2,
+		ACC_STEP = 10,
+		BRK_STEP = 10
+	};
+}
+
+class Car
+{
+private:
+	char gameID[CAR_CONST::ID_LEN]; // 소유자 ID
+	int fuelGauge; // 연료량
+	int curSpeed; // 현재속도
+public:
+	void InitMembers(const char * ID, int fuel);
+	void ShowCarState();  // 상태정보 출력
+	void Accel();  // 엑셀, 속도증가
+	void Break();  // 브레이크, 속도감소
+};
+
+#endif // ! __CAR_H__
+```
+
+##### Car.cpp
+```C++
+#include <iostream>
+#include <cstring>
+#include "Car.h" 
+using namespace std;
+
+
+void Car::InitMembers(const char * ID, int fuel)
+{
+	strcpy(gameID, ID);
+	fuelGauge = fuel;
+	curSpeed = 0;
+}
+
+void Car::ShowCarState()
+{
+	cout << "소유자ID: " << gameID << endl;
+	cout << "연료량: " << fuelGauge << "%" << endl;
+	cout << "현재속도: " << curSpeed << "km/s" << endl << endl;
+}
+
+void Car::Accel()
+{
+	if (fuelGauge <= 0)
+		return;
+	else
+		fuelGauge -= CAR_CONST::FUEL_STEP;
+
+	if (curSpeed + CAR_CONST::ACC_STEP >= CAR_CONST::MAX_SPD)
+	{
+		curSpeed = CAR_CONST::MAX_SPD;
+		return;
+	}
+
+	curSpeed += CAR_CONST::ACC_STEP;
+}
+
+void Car::Break()
+{
+	if (curSpeed < CAR_CONST::BRK_STEP)
+	{
+		curSpeed = 0;
+		return;
+	}
+
+	curSpeed -= CAR_CONST::BRK_STEP;
+}
+```
+
+##### RacingMain.cpp
+```C++
+#include "Car.h"
+
+int main(void)
+{
+	Car run99;
+	run99.InitMembers("run99", 100);
+	run99.Accel();
+	run99.Accel();
+	run99.Accel();
+	run99.ShowCarState();
+	run99.Break();
+	run99.ShowCarState();
+
+	return 0;
+} 
+```
+
+- 인라인 함수는 헤더파일에 함께 넣기
+##### CarInline.h
+```C++
+#ifndef  __CARINLINE_H__ //헤더파일의 중복포함 문제를 해결하기 위한 매크로 선언
+#define __CARINLINE_H__
+
+#include <iostream>
+using namespace std;
+
+namespace CAR_CONST // 클래스 Car에서 제한적으로 사용되는 상수의 선언이므로 클래스 Car와 같은 파일에 선언
+{
+	enum
+	{
+		ID_LEN = 20,
+		MAX_SPD = 200,
+		FUEL_STEP = 2,
+		ACC_STEP = 10,
+		BRK_STEP = 10
+	};
+}
+
+class Car
+{
+private:
+	char gameID[CAR_CONST::ID_LEN]; // 소유자 ID
+	int fuelGauge; // 연료량
+	int curSpeed; // 현재속도
+public:
+	void InitMembers(const char * ID, int fuel);
+	void ShowCarState();  // 상태정보 출력
+	void Accel();  // 엑셀, 속도증가
+	void Break();  // 브레이크, 속도감소
+};
+
+inline void Car::ShowCarState()
+{
+	cout << "소유자ID: " << gameID << endl;
+	cout << "연료량: " << fuelGauge << "%" << endl;
+	cout << "현재속도: " << curSpeed << "km/s" << endl << endl;
+}
+
+inline void Car::Break()
+{
+	if (curSpeed < CAR_CONST::BRK_STEP)
+	{
+		curSpeed = 0;
+		return;
+	}
+
+	curSpeed -= CAR_CONST::BRK_STEP;
+}
+
+#endif // ! __CAR_H__
+```
+
+##### CarInline.cpp
+```C++
+#include <cstring>
+#include "CarInline.h" 
+using namespace std;
+
+
+void Car::InitMembers(const char * ID, int fuel)
+{
+	strcpy(gameID, ID);
+	fuelGauge = fuel;
+	curSpeed = 0;
+}
+
+
+
+void Car::Accel()
+{
+	if (fuelGauge <= 0)
+		return;
+	else
+		fuelGauge -= CAR_CONST::FUEL_STEP;
+
+	if (curSpeed + CAR_CONST::ACC_STEP >= CAR_CONST::MAX_SPD)
+	{
+		curSpeed = CAR_CONST::MAX_SPD;
+		return;
+	}
+
+	curSpeed += CAR_CONST::ACC_STEP;
+}
+```
+
+##### RacingMain.cpp
+```C++
+#include "Car.h"
+
+int main(void)
+{
+	Car run99;
+	run99.InitMembers("run99", 100);
+	run99.Accel();
+	run99.Accel();
+	run99.Accel();
+	run99.ShowCarState();
+	run99.Break();
+	run99.ShowCarState();
+
+	return 0;
+} 
+```
+
+### 03-3. 객체지향 프로그래밍의 이해
+- 객체지향 프로그래밍 : 현실에 존재하는 사물과 대상, 그리고 그에 따른 행동을 있는 그대로 실체화시키는 형태의 프로그래밍
+- 객체 : 데이터 + 기능
+
+ex. 과일장수가 사과를 팔 때 과일장수 객체를 구성하게 되는 변수와 함수 마련
+```c++
+int SaleApples(int money)  // 사과 구매액이 함수의 인자로 전달
+{
+	int num=money/1000; //사과가 개당 1000원이라고 가정
+	numOfApples -=num;  // 사과의 수가 줄어들고,
+	myMoney+=money;  // 판매 수익이 발생
+	return num;   // 실제 구매가 발생한 사과의 수를 반환
+```
+
+- 클래스 정의 : 틀 만들기
+```C++
+class FruitSeller
+{
+private:
+	int APPLE_PRICE; //사과의 가격 
+	int numOfApples;
+	int myMoney;
+public:
+	void InitMembers(int price, int num, int money)
+	{
+		APPLE_PRICE=price;
+		numOfApples=num;
+		myMoney=money;
+	}
+	
+	int SaleApples(int money)
+	{
+		int num=money/APPLE_PRICE;
+		numOfApples-=num;
+		myMoney+=money;
+		return num; // 판매한 과일의 수를 반환
+	}
+	
+	void ShowSalesResult()
+	{
+		cout<<"남은 사과: "<<numOfApples<<endl;
+		cout<<"판매 수익: "<<myMoney<<endl;
+	}
+};
+```
+
+```C++
+class FruitBuyer
+{
+	int myMoney; //private:
+	int numOfApples; //private:
+public:
+	void InitMembers(int money)
+	{
+		myMoney=money;
+		numOfApples=0; //사과구매 이전이므로
+	}
+	
+	void BuyApples(FruitSeller &seller, int money)
+	{
+		numOfApples+=seller.SaleApples(money);
+		myMoney-=money;
+	}
+	
+	void ShowBuyResult()
+	{
+		cout<<"현재 잔액: "<<myMoney<<endl;
+		cout<<"사과 개수: "<<numOfApples<<endl;
+	}
+};
+```
+
+#### 클래스 기반의 두 가지 객체 생성 방법
+1. ClassName objName; // 일반적인 변수의 선언방식
+2. ClassName * ptrObj=new ClassName; // 동적 할당방식(힙 할당방식)
+
+```C++
+#include <iostream>
+using namespace std;
+
+class FruitSeller
+{
+private:
+	int APPLE_PRICE; //사과의 가격 
+	int numOfApples;
+	int myMoney;
+public:
+	void InitMembers(int price, int num, int money)
+	{
+		APPLE_PRICE = price;
+		numOfApples = num;
+		myMoney = money;
+	}
+
+	int SaleApples(int money)
+	{
+		int num = money / APPLE_PRICE;
+		numOfApples -= num;
+		myMoney += money;
+		return num; // 판매한 과일의 수를 반환
+	}
+
+	void ShowSalesResult()
+	{
+		cout << "남은 사과: " << numOfApples << endl;
+		cout << "판매 수익: " << myMoney << endl;
+	}
+};
+
+class FruitBuyer
+{
+	int myMoney; //private:
+	int numOfApples; //private:
+public:
+	void InitMembers(int money)
+	{
+		myMoney = money;
+		numOfApples = 0; //사과구매 이전이므로
+	}
+
+	void BuyApples(FruitSeller &seller, int money)
+	{
+		numOfApples += seller.SaleApples(money);
+		myMoney -= money;
+	}
+
+	void ShowBuyResult()
+	{
+		cout << "현재 잔액: " << myMoney << endl;
+		cout << "사과 개수: " << numOfApples << endl;
+	}
+};
+
+int main(void)
+{
+	FruitSeller seller;
+	seller.InitMembers(1000, 20, 0);
+	FruitBuyer buyer;
+	buyer.InitMembers(5000);
+	buyer.BuyApples(seller, 2000);  //과일의 구매
+
+	cout << "과일 판매자의 현황" << endl;
+	seller.ShowSalesResult();
+	cout << "과일 구매자의 현황" << endl;
+	buyer.ShowBuyResult();
+	return 0;
+}
+```
