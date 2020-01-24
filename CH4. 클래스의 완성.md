@@ -465,5 +465,76 @@ SimpleClass sc1()
 	return sc;
 }
 ```
+
+``` C++
+#include <iostream>
+using namespace std;
+
+class FruitSeller
+{
+private:
+	int APPLE_PRICE; //사과의 가격 
+	int numOfApples;
+	int myMoney;
+public:
+	FruitSeller(int price, int num, int money)
+	{
+		APPLE_PRICE = price;
+		numOfApples = num;
+		myMoney = money;
+	}
+
+	int SaleApples(int money)
+	{
+		int num = money / APPLE_PRICE;
+		numOfApples -= num;
+		myMoney += money;
+		return num; // 판매한 과일의 수를 반환
+	}
+
+	void ShowSalesResult()
+	{
+		cout << "남은 사과: " << numOfApples << endl;
+		cout << "판매 수익: " << myMoney << endl;
+	}
+};
+
+class FruitBuyer
+{
+	int myMoney; //private:
+	int numOfApples; //private:
+public:
+	FruitBuyer(int money)
+	{
+		myMoney = money;
+		numOfApples = 0; //사과구매 이전이므로
+	}
+
+	void BuyApples(FruitSeller &seller, int money)
+	{
+		numOfApples += seller.SaleApples(money);
+		myMoney -= money;
+	}
+
+	void ShowBuyResult()
+	{
+		cout << "현재 잔액: " << myMoney << endl;
+		cout << "사과 개수: " << numOfApples << endl;
+	}
+};
+
+int main(void)
+{
+	FruitSeller seller(1000, 20, 0);
+	FruitBuyer buyer(5000);
+	buyer.BuyApples(seller, 2000);  //과일의 구매
+
+	cout << "과일 판매자의 현황" << endl;
+	seller.ShowSalesResult();
+	cout << "과일 구매자의 현황" << endl;
+	buyer.ShowBuyResult();
+	return 0;
+}
+```
 ### 04-4. 클래스와 배열 그리고 this 포인터
 
