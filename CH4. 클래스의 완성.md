@@ -192,9 +192,57 @@ int main(void)
 ```
 
 #### const함수
-- 이 함수내에서는 멤버변수에 저장된 값을 변경하지 않겠다!
+- 의미 : 이 함수내에서는 멤버변수에 저장된 값을 변경하지 않겠다!
+- 특징 : const 함수 내에서는 const가 아닌 함수의 호출이 제한됨
 
+```c++
+class SimpleClass
+{
+private:
+	int num;
+public:
+	void InitNum(int n)
+	{
+		num=n;
+	}
+	int GetNum()  // const 선언이 추가되어야 아래의 컴파일 에러 소멸
+	{
+		return num;
+	}
+	void ShowNum() const
+	{
+		cout<<GetNum()<<endl;  // 컴파일 에러 발생. ShowNum은 const인데 GetNum은 const가 아니기 때문.
+	}
+};
+```
 
+```C++
+class EasyClass
+{
+private:
+	int num;
+public:
+	void InitNum(int n)
+	{
+		num=n;
+	}
+	int GetNum()  // const 선언이 추가되어야 아래의 컴파일 에러 소멸
+	{
+		return num;
+	}
+};
+
+class LiveClass
+{
+private:
+	int num;
+public:
+	void InitNum(const EasyClass &easy)
+	{
+		num=easy.GetNum();  // 컴파일 에러 발생
+	}
+};
+```
 ### 04-2. 캡슐화(Encapsulation)
 
 ### 04-3. 생성자(Constructor)와 소멸자(Destructor)
