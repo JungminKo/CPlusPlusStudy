@@ -245,6 +245,134 @@ public:
 ```
 ### 04-2. 캡슐화(Encapsulation)
 
+#### 캡슐화가 안된 코드 예시
+```C++
+#include <iostream>
+using namespace std;
+
+class SinivelCap //콧물 처치용 캡슐
+{
+public:
+	void Take() const
+	{
+		cout << "콧물이 싹~ 납니다." << endl;
+	}
+};
+
+class SneezeCap //재채기 처치용 캡슐
+{
+public:
+	void Take() const
+	{
+		cout << "재채기가 멎습니다." << endl;
+	}
+};
+
+class SnuffleCap //코막힘 처치용 캡슐
+{
+public:
+	void Take() const
+	{
+		cout << "코가 뻥 뚫립니다." << endl;
+	}
+};
+
+class ColdPatient 
+{
+public:
+	void TakeSinivelCap(const SinivelCap &cap) const
+	{
+		cap.Take();
+	}
+	void TakeSneezeCap(const SneezeCap &cap) const
+	{
+		cap.Take();
+	}
+	void TakeSnuffleCap(const SnuffleCap &cap) const
+	{
+		cap.Take();
+	}
+};
+
+int main(void)
+{
+	SinivelCap scap;
+	SneezeCap zcap;
+	SnuffleCap ncap;
+
+	ColdPatient snufferer;
+	snufferer.TakeSinivelCap(scap);
+	snufferer.TakeSneezeCap(zcap);
+	snufferer.TakeSnuffleCap(ncap);
+	return 0;
+}
+```
+
+#### 캡슐화를 잘 한 결과
+```C++
+#include <iostream>
+using namespace std;
+
+class SinivelCap //콧물 처치용 캡슐
+{
+public:
+	void Take() const
+	{
+		cout << "콧물이 싹~ 납니다." << endl;
+	}
+};
+
+class SneezeCap //재채기 처치용 캡슐
+{
+public:
+	void Take() const
+	{
+		cout << "재채기가 멎습니다." << endl;
+	}
+};
+
+class SnuffleCap //코막힘 처치용 캡슐
+{
+public:
+	void Take() const
+	{
+		cout << "코가 뻥 뚫립니다." << endl;
+	}
+};
+
+class CONTAC600
+{
+private:
+	SinivelCap sin;
+	SneezeCap sne;
+	SnuffleCap snu;
+
+public:
+	void Take() const
+	{
+		sin.Take();
+		sne.Take();
+		snu.Take();
+	}
+};
+
+class ColdPatient
+{
+public:
+	void TakeCONTAC600(const CONTAC600 &cap) const
+	{
+		cap.Take();
+	}
+};
+
+int main(void)
+{
+	CONTAC600 cap;
+	ColdPatient sufferer;
+	sufferer.TakeCONTAC600(cap);
+	return 0;
+}
+```
 ### 04-3. 생성자(Constructor)와 소멸자(Destructor)
 
 ### 04-4. 클래스와 배열 그리고 this 포인터
