@@ -374,6 +374,96 @@ int main(void)
 }
 ```
 ### 04-3. 생성자(Constructor)와 소멸자(Destructor)
+#### 생성자의 이해
+- 클래스 이름=함수이름
+- 반환형선언X
+- 객체 생성시 딱 한번만 호출
+```c++
+#include <iostream>
+using namespace std;
 
+class SimpleClass
+{
+private:
+	int num1;
+	int num2;
+public:
+	SimpleClass() // 생성자(constructor)
+	{
+		num1 = 0;
+		num2 = 0;
+	}
+	SimpleClass(int n) // 생성자(constructor)
+	{
+		num1 = n;
+		num2 = 0;
+	}
+	SimpleClass(int n1, int n2) // 생성자(constructor)
+	{
+		num1 = n1;
+		num2 = n2;
+	}
+	/*
+	SimpleClass(int n1=0, int n2=0) // 위에꺼 3개를 하나로 통합가능
+	{
+		num1 = n1;
+		num2 = n2;
+	}
+	*/
+	void ShowData() const
+	{
+		cout << num1 << ' ' << num2 << endl;
+	}
+};
+
+int main(void)
+{
+	SimpleClass sc1;
+	sc1.ShowData();
+
+	SimpleClass sc2(100);
+	sc2.ShowData();
+
+	SimpleClass sc3(100, 200);
+	sc3.ShowData();
+
+	return 0;
+}
+```
+```c++
+#include <iostream>
+using namespace std;
+
+class SimpleClass
+{
+private:
+	int num1;
+	int num2;
+public:
+	SimpleClass(int n1=0, int n2=0) // 위에꺼 3개를 하나로 통합가능
+	{
+		num1 = n1;
+		num2 = n2;
+	}
+	void ShowData() const
+	{
+		cout << num1 << ' ' << num2 << endl;
+	}
+};
+
+int main(void)
+{
+	SimpleClass sc1();
+	SimpleClass mysc = sc1();
+	mysc.ShowData();
+	return 0;
+}
+
+SimpleClass sc1()
+{
+	SimpleClass sc(20, 30);
+	return sc;
+}
+```
 ### 04-4. 클래스와 배열 그리고 this 포인터
 
