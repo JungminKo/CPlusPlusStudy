@@ -799,4 +799,256 @@ int main(void)
 ```
 ### 04-4. 클래스와 배열 그리고 this 포인터
 
-#### 클래스
+#### 객체 배열
+- 배열 선언시 생성자는 호출이 되지만, 호출할 생성자를 별도로 명시할 수 있는 것은 아니다.
+- 배열선언 이후 각각의 요소를 원하는 값으로 초기화시키려면 일일이 초기화해야함
+```C++
+#include <iostream>
+#include <cstring>
+using namespace std;
+
+class Person
+{
+private:
+	char *name;
+	int age;
+public:
+	Person(char const *myname, int myage)
+	{
+		int len = strlen(myname) + 1;
+		name = new char[len];
+		strcpy(name, myname);
+		age = myage;
+	}
+	Person() 
+	{
+		name = NULL;
+		age = 0;
+		cout << "called Person()" << endl;
+	}
+	void SetPersonInfo(char *myname, int myage)
+	{
+		name = myname;
+		age= myage;
+	}
+	void ShowPersonInfo() const
+	{
+		cout << "이름: " << name << endl;
+		cout << "나이: " << age << endl;
+	}
+	~Person()
+	{
+		delete[]name;
+		cout << "called destrcutor!" << endl;
+	}
+};
+
+int main(void)
+{
+	Person parr[3];
+	char namestr[100];
+	char * strptr;
+	int age;
+	int len;
+
+	for (int i = 0; i < 3; i++)
+	{
+		cout << "이름: ";
+		cin >> namestr;
+		cout << "나이: ";
+		cin >> age;
+		len = strlen(namestr) + 1;
+		strptr = new char[len];
+		strcpy(strptr, namestr);
+		parr[i].SetPersonInfo(strptr, age);
+	}
+	parr[0].ShowPersonInfo();
+	parr[1].ShowPersonInfo();
+	parr[2].ShowPersonInfo();
+	return 0;
+}
+```
+
+#### 객체포인터 배열
+```C++
+#include <iostream>
+#include <cstring>
+using namespace std;
+
+class Person
+{
+private:
+	char *name;
+	int age;
+public:
+	Person(char const *myname, int myage)
+	{
+		int len = strlen(myname) + 1;
+		name = new char[len];
+		strcpy(name, myname);
+		age = myage;
+	}
+	Person() 
+	{
+		name = NULL;
+		age = 0;
+		cout << "called Person()" << endl;
+	}
+	void SetPersonInfo(char *myname, int myage)
+	{
+		name = myname;
+		age= myage;
+	}
+	void ShowPersonInfo() const
+	{
+		cout << "이름: " << name << endl;
+		cout << "나이: " << age << endl;
+	}
+	~Person()
+	{
+		delete[]name;
+		cout << "called destrcutor!" << endl;
+	}
+};
+
+int main(void)
+{
+	Person * parr[3];
+	char namestr[100];
+	int age;
+
+	for (int i = 0; i < 3; i++)
+	{
+		cout << "이름: ";
+		cin >> namestr;
+		cout << "나이: ";
+		cin >> age;
+		parr[i]=new Person(namestr, age);
+	}
+	parr[0]->ShowPersonInfo();
+	parr[1]->ShowPersonInfo();
+	parr[2]->ShowPersonInfo();
+	delete parr[0];
+	delete parr[1];
+	delete parr[2];
+	return 0;
+}
+```
+
+#### this 포인터
+```C++
+#include <iostream>
+#include <cstring>
+using namespace std;
+
+class SoSimple
+{
+private:
+	int num;
+public:
+	SoSimple(int n) : num(n)
+	{
+		cout << "num=" << num << ", ";
+		cout << "address=" << this << endl;
+	}
+	void ShowSimpleData()
+	{
+		cout << num << endl;
+	}
+	SoSimple * GetThisPointer()
+	{
+		return this;
+	}
+};
+
+int main(void)
+{
+	SoSimple sim1(100);
+	SoSimple *ptr1 = sim1.GetThisPointer(); //sim1 객체의 주소값 저장
+	cout << ptr1 << ", ";
+	ptr1->ShowSimpleData();
+
+	SoSimple sim2(200);
+	SoSimple *ptr2 = sim2.GetThisPointer(); //sim2 객체의 주소값 저장
+	cout << ptr2 << ", ";
+	ptr2->ShowSimpleData();
+	return 0;
+}
+```
+#### this 포인터의 활용
+- this를 활용하면 매개변수의 이름와 멤버변수의 이름이 같을 때 멤버변수에 접근할 수 있음
+```C++
+#include <iostream>
+using namespace std;
+
+class TwoNumber
+{
+private:
+	int num1;
+	int num2;
+public:
+	TwoNumber(int num1, int num2)
+	{
+		this->num1 = num1; 
+		this->num2 = num2; 
+	}
+	/*
+	TwoNumber(int num1, int num2)
+		: num1(num1), num2(num2)
+	{}
+	*/
+	void ShowTwoNumber()
+	{
+		cout << this->num1 << endl;  // 멤버변수에 접근함을 명확히함. 일반적으로 this는 생략.
+		cout << this->num2 << endl;
+	}
+};
+
+int main(void)
+{
+	TwoNumber two(2, 4);
+	two.ShowTwoNumber();
+
+	return 0;
+}
+```
+
+#### self-Reference의 반환
+- 객체 자신을 참조할 수 있는 참조자
+```C++
+#include <iostream>
+using namespace std;
+
+class SelfRef
+{
+private:
+	int num;
+public:
+	SelfRef(int n) :num(n)
+	{
+		cout << "객체 생성" << endl;
+	}
+	SelfRef& Adder(int n)
+	{
+		num += n;
+		return *this;
+	}
+	SelfRef& ShowTwoNumber()
+	{
+		cout << num << endl;
+		return *this;
+	}
+};
+
+int main(void)
+{
+	SelfRef obj(3);
+	SelfRef &ref = obj.Adder(2);
+
+	obj.ShowTwoNumber();
+	ref.ShowTwoNumber();
+
+	ref.Adder(1).ShowTwoNumber().Adder(2).ShowTwoNumber();
+	return 0;
+}
+```
