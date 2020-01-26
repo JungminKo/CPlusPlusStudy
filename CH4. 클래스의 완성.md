@@ -536,6 +536,267 @@ int main(void)
 	return 0;
 }
 ```
+#### 멤버 이니셜라이저
+##### Point.h
+```C++
+#ifndef __POINT_H__
+#define __POINT_H__
+
+class Point
+{
+private:
+	int x; //x좌표의 범위는 0이상 100이하
+	int y; //y좌표의 범위는 0이상 100이하
+
+public:
+	Point(const int &xpos, const int &ypos);
+	int GetX() const;
+	int GetY() const;
+	bool SetX(int xpos);
+	bool SetY(int ypos);
+};
+#endif // !__POINT_H__
+```
+##### Point.cpp
+```C++
+#include <iostream>
+#include "Point.h"
+using namespace std;
+
+Point::Point(const int &xpos, const int &ypos)
+{
+	x = xpos;
+	y = ypos;
+
+}
+
+int Point::GetX() const //const 함수!
+{
+	return x;
+}
+
+int Point::GetY() const //const 함수!
+{
+	return y;
+}
+
+bool Point::SetX(int xpos)
+{
+	if (0 > xpos || xpos > 100)
+	{
+		cout << "벗어난 범위의 값 전달" << endl;
+		return false;
+	}
+	x = xpos;
+	return true;
+}
+
+bool Point::SetY(int ypos)
+{
+	if (0 > ypos || ypos > 100)
+	{
+		cout << "벗어난 범위의 값 전달" << endl;
+		return false;
+	}
+	y = ypos;
+	return true;
+}
+```
+##### Rectangle.h
+```C++
+#ifndef  __RECTANGLE_H__
+#define __RECTANGLE_H__
+
+#include "Point.h"
+class Rectangle
+{
+public:
+	Point upLeft;  // 클래스의 멤버로 객체를 둘 수 있음
+	Point lowRight;
+
+public:
+	Rectangle(const int &x1, const int &y1, const int &x2, const int &y2);
+	void ShowRecInfo() const;
+};
+#endif // ! __RECTANGLE_H__
+```
+##### Rectangle.cpp
+```C++
+#include <iostream>
+#include "Rectangle.h"
+using namespace std;
+
+Rectangle::Rectangle(const int &x1, const int &y1, const int &x2, const int &y2)
+			:upLeft(x1, y1), lowRight(x2, y2) // 멤버이니셜라이져
+{
+	//empty
+}
+
+void Rectangle::ShowRecInfo() const
+{
+	cout << "좌 상단: " << '[' << upLeft.GetX() << ", ";
+	cout << upLeft.GetY() << ']' << endl;
+	cout << "우 하단: " << '[' << lowRight.GetX() << ", ";
+	cout << lowRight.GetY() << ']' << endl;
+}
+```
+##### RectangleFaultFind.cpp
+```C++
+#include <iostream>
+#include "Point.h"
+#include "Rectangle.h"
+using namespace std;
+
+int main(void)
+{
+	Rectangle rec(1, 1, 5, 5);
+	rec.ShowRecInfo();
+	return 0;
+}
+```
+- const 멤버변수도 이니셜라이저를 이용하여 초기화 가능
+```C++
+class FruitSeller
+{
+private:
+	const int APPLE_PRICE; //사과의 가격 
+	int numOfApples;
+	int myMoney;
+public:
+	FruitSeller(int price, int num, int money)
+		:APPLE_PRICE(price), numOfApples(num), myMoney(money)
+	{
+	}
+	...
+};
+```
+- 멤버변수로 참조자 선언가능
+```C++
+#include <iostream>
+using namespace std;
+
+class AAA
+{
+public:
+	AAA()
+	{
+		cout << "empty object" << endl;
+	}
+	void ShowYourName()
+	{
+		cout << "I'm class AAA" << endl;
+	}
+};
+
+class BBB
+{
+private:
+	AAA &ref;
+	const int &num;
+public:
+	BBB(AAA &r, const int &n)
+		:ref(r), num(n)
+	{
+		//empty constructor body
+	}
+	void ShowYourName()
+	{
+		ref.ShowYourName();
+		cout << "and" << endl;
+		cout << "I ref num " << num << endl;
+	}
+};
+
+int main(void)
+{
+	AAA obj1;
+	BBB obj2(obj1, 20);
+	obj2.ShowYourName();
+	return 0;
+}
+```
+#### 디폴트 생성자
+- 객체가 되기 위해서는 반드시 하나의 생성자가 호출되어야 하기 떄문에 생성자를 정의하지 않더라도 자동으로 삽입됨.
+#### private 생성자
+```C++
+#include <iostream>
+using namespace std;
+
+class AAA
+{
+private:
+	int num;
+public:
+	AAA() :num(0) {}
+	AAA& CreateInitObj(int n) const
+	{
+		AAA *ptr = new AAA(n);
+		return *ptr;
+	}
+	void ShowNum() const
+	{
+		cout << num << endl;
+	}
+private:
+	AAA(int n) :num(n) {}
+};
+
+int main(void)
+{
+	AAA base;
+	base.ShowNum();
+
+	AAA &obj1 = base.CreateInitObj(3);  // 힙 영역에 생성된 객체(new로)를 참조의 형태로 반환!
+	obj1.ShowNum();
+
+	AAA &obj2 = base.CreateInitObj(12);
+	obj2.ShowNum();
+
+	delete &obj1;
+	delete &obj2;
+	return 0;
+}
+```
+#### 소멸자
+```C++
+#include <iostream>
+#include <cstring>
+using namespace std;
+
+class Person
+{
+private:
+	char *name;
+	int age;
+public:
+	Person(char const *myname, int myage)
+	{
+		int len = strlen(myname) + 1;
+		name = new char[len];
+		strcpy(name, myname);
+		age = myage;
+	}
+	void ShowPersonInfo() const
+	{
+		cout << "이름: " << name << endl;
+		cout << "나이: " << age << endl;
+	}
+	~Person()
+	{
+		delete []name;
+		cout << "called destrcutor!" << endl;
+	}
+};
+
+int main(void)
+{
+	Person man1("Lee dong woo", 29);
+	Person man2("Jang dong gun", 41);
+	man1.ShowPersonInfo();
+	man2.ShowPersonInfo();
+	return 0;
+}
+```
 ### 04-4. 클래스와 배열 그리고 this 포인터
 
 #### 클래스
