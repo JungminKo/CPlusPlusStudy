@@ -168,3 +168,82 @@ int main(void)
 	return 0;
 }
 ```
+
+- 임시객체는 다음 행으로 넘어가면 바로 소멸됨
+- 참조자에 참조되는 임시객체는 바로 소멸되지 않음
+```c++
+#include <iostream>
+using namespace std;
+
+class Temporary
+{
+private:
+	int num;
+public:
+	Temporary(int n) :num(n)
+	{
+		cout << "Create obj: " << num << endl;
+	}
+	~Temporary()
+	{
+		cout << "destory obj: " << num << endl;
+	}
+	void ShowTempInfo()
+	{
+		cout << "My num is " << num << endl;
+	}
+};
+
+
+int main(void)
+{
+	Temporary(100);
+	cout << "********* after make!" << endl << endl;
+	Temporary(200).ShowTempInfo();
+	cout << "********* after make!" << endl << endl;
+	const Temporary & ref = Temporary(300);
+	cout << "********* end of main!" << endl << endl;
+	return 0;
+}
+```
+
+```C++
+#include <iostream>
+using namespace std;
+
+class SoSimple
+{
+private:
+	int num;
+public:
+	SoSimple(int n) :num(n)
+	{
+		cout << "New object: " << this << endl;
+	}
+	SoSimple(const SoSimple &copy) :num(copy.num)
+	{
+		cout << "New Copy obj: " << this << endl;
+	}
+	~SoSimple()
+	{
+		cout << "Destory obj: " << this << endl;
+	}
+};
+
+SoSimple SimpleFuncObj(SoSimple ob)
+{
+	cout << "Param ADR: " << &ob << endl;
+	return ob;
+}
+
+int main(void)
+{
+	SoSimple obj(7);
+	SimpleFuncObj(obj);
+
+	cout << endl;
+	SoSimple tempRef = SimpleFuncObj(obj);
+	cout << "Return obj " << &tempRef << endl;
+	return 0;
+}
+```
