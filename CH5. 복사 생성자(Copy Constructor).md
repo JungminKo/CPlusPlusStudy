@@ -91,3 +91,80 @@ Person(const Person& copy)
 		strcpy(name, copy.name);
 	}
 ```
+
+### 05-3. 복사 생성자의 호출시점
+1. 기존에 생성된 객체를 이용해서 새로운 개체를 초기화하는 경우
+2. call-by-value 방식의 함수호출 과정에서 객체를 전달하는 경우
+3. 객체를 반환하되, 참조형으로 반환하지 않는 경우
+```C++
+#include <iostream>
+using namespace std;
+
+class SoSimple
+{
+private:
+	int num;
+public:
+	SoSimple(int n) :num(n) {}
+	SoSimple(const SoSimple &copy) :num(copy.num)
+	{
+		cout << "Called SoSimple(const SoSimple &copy)" << endl;
+	}
+	void ShowData()
+	{
+		cout << "num: " << num << endl;
+	}
+};
+
+void SimpleFuncObjc(SoSimple ob)
+{
+	ob.ShowData();
+}
+int main(void)
+{
+	SoSimple obj(7);
+	cout << "함수 호출 전" << endl;
+	SimpleFuncObjc(obj);//함수에 obj 인자를 전달하는 과정에서 복사생성자 호출됨
+	cout << "함수 호출 후" << endl;
+	return 0;
+}
+```
+
+```C++
+#include <iostream>
+using namespace std;
+
+class SoSimple
+{
+private:
+	int num;
+public:
+	SoSimple(int n) :num(n) {}
+	SoSimple(const SoSimple &copy) :num(copy.num)
+	{
+		cout << "Called SoSimple(const SoSimple &copy)" << endl;
+	}
+	SoSimple & AddNum(int n)
+	{
+		num += n;
+		return *this;
+	}
+	void ShowData()
+	{
+		cout << "num: " << num << endl;
+	}
+};
+
+SoSimple SimpleFuncObj(SoSimple ob)
+{
+	cout << "return 이전" << endl;
+	return ob;
+}
+int main(void)
+{
+	SoSimple obj(7);
+	SimpleFuncObj(obj).AddNum(30).ShowData();
+	obj.ShowData();
+	return 0;
+}
+```
