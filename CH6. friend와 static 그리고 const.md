@@ -331,3 +331,68 @@ int main(void)
 }
 
 ```
+#### static 멤버함수
+- 선언된 클래스의 모든 객체가 공유
+- public으로 선언되면 클래스의 이름을 이용해서 호출가능
+- 객체의 멤버로 존재하는 것은 아님
+- static 멤버함수내에서는 static 멤버변수와 static 멤버함수만 호출 가능
+```C++
+#include <iostream>
+using namespace std;
+
+
+class CountryArea 
+{
+public:
+	const static int RUSSIA = 1707540;
+	const static int CANADA = 998467;
+	const static int CHINA = 957290;
+	const static int SOUTH_KOREA = 9922;
+};
+
+int main(void)
+{
+	cout << "러시아 면적: " << CountryArea::RUSSIA << "km" << endl;
+	cout << "캐나다 면적: " << CountryArea::CANADA << "km" << endl;
+	cout << "중국 면적: " << CountryArea::CHINA << "km" << endl;
+	cout << "한국 면적: " << CountryArea::SOUTH_KOREA << "km" << endl;
+
+	return 0;
+}
+```
+
+#### 키워드 mutable
+- const 함수 내에서 값의 변경을 예외적으로 허용
+- but 최대한 사용을 자제해야함
+```C++
+#include <iostream>
+using namespace std;
+
+
+class SoSimple 
+{
+private:
+	int num1;
+	mutable int num2; // const 함수에 대해 예외를 둔다!
+public:
+	SoSimple(int n1, int n2) : num1(n1), num2(n2)
+	{}
+	void ShowSimpleData() const
+	{
+		cout << num1 << ", " << num2 << endl;
+	}
+	void CopyToNum2() const
+	{
+		num2 = num1;
+	}
+};
+
+int main(void)
+{
+	SoSimple sm(1, 2);
+	sm.ShowSimpleData();
+	sm.CopyToNum2();
+	sm.ShowSimpleData();
+	return 0;
+}
+```
