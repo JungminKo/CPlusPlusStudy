@@ -209,3 +209,110 @@ int main(void)
 }
 
 ```
+
+#### 유도 클래스 객체의 소멸과정
+- 유도클래스 먼저, 기초클래스 나중에
+- 생성자와 완전 반대의 순서
+```C++
+#include <iostream>
+using namespace std;
+
+
+class SoBase 
+{
+private:
+	int baseNum;
+public:
+	SoBase(int n) : baseNum(n) 
+	{
+		cout << "SoBase() : " << baseNum << endl;
+	}
+	~SoBase()
+	{
+		cout << "~SoBase() : " << baseNum << endl;
+	}
+};
+
+class SoDerived :public SoBase
+{
+private:
+	int derivNum;
+public:
+	SoDerived(int n) : SoBase(n), derivNum(n)
+	{
+		cout << "SoDerived() : " << derivNum << endl;
+	}
+	~SoDerived()
+	{
+		cout << "~SoDerived() : " << derivNum << endl;
+	}
+};
+
+
+int main(void)
+{
+	SoDerived drv1(15);
+	SoDerived drv2(27);
+	return 0;
+}
+```
+
+- 생성자에서 동적할당한 메모리공간은 소멸자에서 해제
+```c++
+#include <iostream>
+#include <cstring>
+using namespace std;
+
+
+class Person
+{
+private:
+	char * name;
+public:
+	Person(const char * myname)
+	{
+		name = new char[strlen(myname) + 1];
+		strcpy(name, myname);
+	}
+	~Person()
+	{
+		delete[]name;
+	}
+	void WhatYourName() const
+	{
+		cout << "My name is " << name << endl;
+	}
+};
+
+class UnivStudent :public Person
+{
+private:
+	char * major;
+public:
+	UnivStudent(const char *myname, const char *mymajor)
+		: Person(myname)
+	{
+		major = new char[strlen(mymajor) + 1];
+		strcpy(major, mymajor);
+	}
+	~UnivStudent()
+	{
+		delete[]major;
+	}
+	void WhoAreYou() const
+	{
+		WhatYourName();
+		cout << "My major is " << major << endl << endl;
+	}
+};
+
+
+int main(void)
+{
+	UnivStudent st1("Kim", "Math");
+	st1.WhoAreYou();
+	UnivStudent st2("Hong", "Physics");
+	st2.WhoAreYou();
+	return 0;
+}
+```
