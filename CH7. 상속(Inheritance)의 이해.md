@@ -316,3 +316,196 @@ int main(void)
 	return 0;
 }
 ```
+
+### 07-3. protected 선언과 세 가지 형태의 상속
+- protected는 private과 클래스의 외부에서 접근이 불가능하다는 점에서 유사
+- 하지만 protected로 선언된 멤버변수는 이를 상속하는 유도 클래스에서 접근이 가능하다는 차이점이 있음
+
+- 상속은 public 상속만 거의 사용!
+
+### 07-4. 상속을 위한 조건
+- 유도 클래스 is a 기초 클래스
+```C++
+#include <iostream>
+#include <cstring>
+using namespace std;
+
+class Computer
+{
+private:
+	char owner[50];
+public:
+	Computer(const char * name)
+	{
+		strcpy(owner, name);
+	}
+	void Calculate()
+	{
+		cout << "요청 내용을 계산합니다." << endl;
+	}
+};
+
+class NotebookComp : public Computer
+{
+private:
+	int Battery;
+public:
+	NotebookComp(const char * name, int initChag)
+		:Computer(name), Battery(initChag){}
+	void Charging() { Battery += 5; }
+	void UseBattery() { Battery -= 1; }
+	void MovingCal()
+	{
+		if (GetBatteryInfo() < 1)
+		{
+			cout << "충전이 필요합니다." << endl;
+			return;
+		}
+		cout << "이동하면서 ";
+		Calculate();
+		UseBattery();
+	}
+	int GetBatteryInfo() { return Battery; }
+};
+
+class TabletNotebook : public NotebookComp
+{
+private:
+	char regstPenModel[50];
+public:
+	TabletNotebook(const char * name, int initChag, const char * pen)
+		:NotebookComp(name, initChag)
+	{
+		strcpy(regstPenModel, pen);
+	}
+	void write(const char * penInfo)
+	{
+		if (GetBatteryInfo() < 1)
+		{
+			cout << "충전이 필요합니다." << endl;
+			return;
+		}
+		if (strcmp(regstPenModel, penInfo) != 0)
+		{
+			cout << "등록된 펜이 아닙니다.";
+			return;
+		}
+		cout << "필기 내용을 처리합니다." << endl;
+		UseBattery();
+	}
+};
+int main(void)
+{
+	NotebookComp nc("이수종", 5);
+	TabletNotebook tn("정수영", 5, "ISE-241-242");
+	nc.MovingCal();
+	tn.write("ISE-241-242");
+	return 0;
+}
+```
+- has a 관계도 상속의 조건은 되지만 복합관계로 이를 대신하는 것이 일반적임
+
+상속관계일때
+```C++
+#include <iostream>
+#include <cstring>
+using namespace std;
+
+class Gun
+{
+private:
+	int bullet; //장전된 총알의 수
+public:
+	Gun(int bnum) :bullet(bnum) {}
+	void Shot()
+	{
+		cout << "BBANG!" << endl;
+		bullet--;
+	}
+};
+
+class Police : public Gun
+{
+private:
+	int handcuffs; // 소유한 수갑의 수
+public:
+	Police(int bnum, int bcuff)
+		:Gun(bnum), handcuffs(bcuff) {}
+	void PutHandcuff()
+	{
+		cout << "SNAP!" << endl;
+		handcuffs--;
+	}
+};
+int main(void)
+{
+	Police pman(5, 3); //총알 5 수갑 3
+	pman.Shot();
+	pman.PutHandcuff();
+	return 0;
+}
+```
+
+복합관계일때
+```c++
+#include <iostream>
+#include <cstring>
+using namespace std;
+
+class Gun
+{
+private:
+	int bullet; //장전된 총알의 수
+public:
+	Gun(int bnum) :bullet(bnum) {}
+	void Shot()
+	{
+		cout << "BBANG!" << endl;
+		bullet--;
+	}
+};
+
+class Police 
+{
+private:
+	int handcuffs; // 소유한 수갑의 수
+	Gun * pistol;  // 소유하고 있는 권총
+public:
+	Police(int bnum, int bcuff)
+		: handcuffs(bcuff)
+	{
+		if (bnum > 0)
+			pistol = new Gun(bnum);
+		else
+			pistol = NULL;
+	}
+	void PutHandcuff()
+	{
+		cout << "SNAP!" << endl;
+		handcuffs--;
+	}
+	void Shot()
+	{
+		if (pistol == NULL)
+			cout << "Hut BBANG!" << endl;
+		else
+			pistol->Shot();
+	}
+	~Police()
+	{
+		if (pistol != NULL)
+			delete pistol;
+	}
+};
+int main(void)
+{
+	Police pman1(5, 3); //총알 5 수갑 3
+	pman1.Shot();
+	pman1.PutHandcuff();
+
+	Police pman2(0, 3); //권총을 소유하지 않은 경찰
+	pman2.Shot();
+	pman2.PutHandcuff();
+	return 0;
+}
+```
